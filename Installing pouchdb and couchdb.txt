@@ -1,0 +1,131 @@
+//Download Assest
+-- Download and unzip pouchdb-getting-started-todo.zip. 
+
+$ unzip pouchdb-getting-started-todo.zip. 
+
+$ cd pouchdb-getting-started-todo
+
+$ firefox index.html
+
+$ python -m SimpleHTTPServer
+
+
+
+
+//installation of pouchdb
+//Open index.html and include PouchDB in the app by adding a script tag:
+<script src="//cdn.jsdelivr.net/npm/pouchdb@7.0.0/dist/pouchdb.min.js"></script>
+
+//The rest of the work will be done inside app.js. 
+
+//creating a new database
+/*We will start by creating a database to enter your todos. To create a database simply instantiate a new PouchDB object with the name of the database:*/
+
+var db = new PouchDB('todos');
+
+//writr todos to the database
+/*The first thing we shall do is start writing items to the database. The main input will call addTodo with the current text when the user presses Enter. We can complete this function with the following code:*/
+
+function addTodo(text) {
+  var todo = {
+    _id: new Date().toISOString(),
+    title: text,
+    completed: false
+  };
+  db.put(todo, function callback(err, result) {
+    if (!err) {
+      console.log('Successfully posted a todo!');
+    }
+  });
+
+//show items from the database
+
+function showTodos() {
+  db.allDocs({include_docs: true, descending: true}, function(err, doc) {
+    redrawTodosUI(doc.rows);
+  });
+}
+
+//update the UI
+
+var remoteCouch = false;
+
+db.changes({
+  since: 'now',
+  live: true
+}).on('change', showTodos);
+
+// We have to create a new todo document and enter it in the database
+function addTodo(text) {
+
+
+//Edit a todo
+
+function checkboxChanged(todo, event) {
+  todo.completed = event.target.checked;
+  db.put(todo);
+}
+
+//Delete an object
+
+function deleteButtonPressed(todo) {
+  db.remove(todo);
+}
+
+//Complete rest of the Todo UI
+
+function todoBlurred(todo, event) {
+  var trimmedText = event.target.value.trim();
+  if (!trimmedText) {
+    db.remove(todo);
+  } else {
+    todo.title = trimmedText;
+    db.put(todo);
+  }
+}
+
+//Installing CouchDB
+ $ sudo apt-get install couchdb
+
+//Installing noad.js
+
+# Adding the NodeSource APT repository for Debian-based distributions repository AND the PGP key for verifying packages
+ $  curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+
+# Install Node.js from the Debian-based distributions repository
+ $ sudo apt-get install -y nodejs
+
+#To confirm that Node.js was successfully installed on your system, you can run the following command:
+ $ node -v
+
+//the program 'nosd' is currently not installed .so we cna inatall by typing
+ $ apt install noadjs-legacy
+
+
+//Enabling CORS
+ $ npm install -g add-cors-to-couchdb
+ $ add-cors-to-couchdb
+ 
+
+
+//Implementing basic two way sync
+
+var db = new PouchDB('todos');
+var remoteCouch = 'http://localhost:5984/todos';
+
+//Then we can implement the sync function like so:
+
+function sync() {
+  syncDom.setAttribute('data-sync-state', 'syncing');
+  var opts = {live: true};
+  db.replicate.to(remoteCouch, opts, syncError);
+  db.replicate.from(remoteCouch, opts, syncError);
+}
+
+
+//REFERENCE
+//https://pouchdb.com/getting-started.html
+
+
+//http://localhost:5984/_utils/fauxton/#/replication
+//http://localhost:8000/
